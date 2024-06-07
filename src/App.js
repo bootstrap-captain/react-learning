@@ -1,12 +1,11 @@
-/*函数式组件*/
-import Citi from "./component/citi/Citi";
-import NikeCompany from "./component/nike/Nike";
+import React from "react";
+import {TodoList} from "./component/TodoList/TodoList";
 
-/*入口的app.js,里面包含多个不同的组件*/
-export default function App() {
-    return (
-        <div>
-            <Citi/>
-            <NikeCompany/>
-        </div>);
+export default class App extends React.Component {
+
+    render() {
+        return (
+            <TodoList/>
+        )
+    }
 }
