@@ -1,46 +1,81 @@
-/*引入UI组件*/
-import {CountUI} from "../../component/Count/CountUI";
-
-/*引入connect用于链接UI组件和redux*/
 import {connect} from "react-redux";
-import {createAsyncIncrementAction, createDecrementAction, createIncrementAction} from "../../redux/count_action";
+import {createAsyncIncrementAction, createDecrementAction, createIncrementAction} from "../../redux/actions/Count";
+import {Component, createRef} from "react";
 
-/*1. 回调函数： 用于向UI组件传递状态
-*   1.1 返回一个对象
-*   1.2 对象的key作为传递给UI组件的props的key， value就是作为传递给UI组件的props的value
-*   1.3 参数：在App组件中已经传递了store，因此store和这个函数交互时候，传入state*/
-function mapStateToProps(state) {
-    return {count: state}
-}
+/*UI的类*/
+export class Count extends Component {
 
-/*2. 回调函数： 用于向UI组件传递操作状态的方法
-*     2.1 返回一个对象
-*     2.2 对象的key作为传递给UI组件的props的key， value作为传递给UI组件的props的value
-*     2.3. value是一个函数*/
-function mapDispatchToPros(dispatch) {
-    return {
-        /*将事件分发给store*/
-        increment: (data) => {
-            dispatch(createIncrementAction(data))
-        },
+    selectRef = createRef();
 
-        decrement: (data) => {
-            dispatch(createDecrementAction(data))
-        },
+    increment = () => {
+        let value = this.selectRef.current.value;
+        this.props.increment(value * 1);
+    }
 
-        incrementIfOdd: (data) => {
-            dispatch(createIncrementAction(data))
-        },
+    decrement = () => {
+        let value = this.selectRef.current.value;
+        this.props.decrement(value * 1);
+    }
 
-        asyncIncrement: (data, time) => {
-            dispatch(createAsyncIncrementAction(data, time))
+    incrementIfOdd = () => {
+        let value = this.selectRef.current.value;
+        let previous = this.props.count;
+        if (previous % 2 !== 0) {
+            this.props.incrementIfOdd(value * 1);
         }
     }
 
+    asyncIncrement = () => {
+        let value = this.selectRef.current.value;
+        this.props.asyncIncrement(value * 1, 1000);
+    }
+
+    render() {
+        return (
+            <div>
+
+                <h1>当前求和为{this.props.count}</h1>
+
+                <select ref={this.selectRef}>
+                    <option value={1}>1</option>
+                    <option value={2}>2</option>
+                    <option value={3}>3</option>
+                </select>&nbsp;&nbsp;&nbsp;
+
+                <button onClick={this.increment}>+</button>
+                &nbsp;&nbsp;&nbsp;
+                <button onClick={this.decrement}>-</button>
+                &nbsp;&nbsp;&nbsp;
+                <button onClick={this.incrementIfOdd}>当前count为奇数再加</button>
+                &nbsp;&nbsp;&nbsp;
+                <button onClick={this.asyncIncrement}>异步加</button>
+
+                <br/>
+                <ul>
+                    {this.props.person.map((p, index) => {
+                        return <li key={index}>{p.name}==={p.address}==={p.age}</li>
+                    })}
+                </ul>
+            </div>
+        )
+    }
+}
+
+/*Container的类, 暴露出去的是这个
+* 1. 可以随便去对应的state中解析需要的数据*/
+function mapStateToProps(state) {
+    return {
+        count: state.count,
+        person: state.person
+    }
+}
+
+const mapDispatchToPros = {
+    increment: createIncrementAction,
+    decrement: createDecrementAction,
+    incrementIfOdd: createIncrementAction,
+    asyncIncrement: createAsyncIncrementAction
 }
 
 
-/*创建容器组件，并暴露
-*  参数一： store，会在app中传递
-*  参数二： UI组件*/
-export const CountContainer = connect(mapStateToProps, mapDispatchToPros)(CountUI);
+export const CountContainer = connect(mapStateToProps, mapDispatchToPros)(Count);
