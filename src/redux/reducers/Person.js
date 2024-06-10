@@ -11,6 +11,7 @@ export default function personReducer(previousState, action) {
 
     switch (type) {
         case ADD_PERSON:
+            /*不能在previousState中push，否则不能触发渲染*/
             return [data, ...previousState]
         default:
             return previousState;
